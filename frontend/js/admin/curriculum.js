@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   const state = {
     search: "",
     status: "",
+    items: [],
   };
 
   const tableBody = document.getElementById("curriculum-table-body");
@@ -19,6 +20,8 @@ document.addEventListener("DOMContentLoaded", async function () {
   const createForm = document.getElementById("create-curriculum-form");
   const createAlert = document.getElementById("create-alert");
   const createSubmitBtn = document.getElementById("create-submit-btn");
+  const modalTitle = document.getElementById("create-modal-title");
+  const editIdInput = document.getElementById("edit-curriculum-id");
 
   let searchTimeout;
 
@@ -45,6 +48,63 @@ document.addEventListener("DOMContentLoaded", async function () {
     });
   }
 
+  function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function buildPayload(formData, isEdit) {
+    const payload = {
+      name: formData.get("name"),
+      status: formData.get("status"),
+    };
+
+    const description = formData.get("description");
+    const duration = formData.get("duration_weeks");
+
+    if (isEdit) {
+      payload.description = description || null;
+      payload.duration_weeks = duration ? Number(duration) : null;
+    } else {
+      if (description) {
+        payload.description = description;
+      }
+      if (duration) {
+        payload.duration_weeks = Number(duration);
+      }
+    }
+
+    return payload;
+  }
+
+  function openCreateModal() {
+    hideAlert(createAlert);
+    editIdInput.value = "";
+    modalTitle.textContent = "Create curriculum";
+    createSubmitBtn.textContent = "Create";
+    createForm.reset();
+    createModal.classList.remove("hidden");
+  }
+
+  function openEditModal(item) {
+    hideAlert(createAlert);
+    editIdInput.value = item.curriculum_id;
+    modalTitle.textContent = "Edit curriculum";
+    createSubmitBtn.textContent = "Save changes";
+    createForm.reset();
+    document.getElementById("create-name").value = item.name;
+    document.getElementById("create-description").value = item.description || "";
+    document.getElementById("create-duration").value = item.duration_weeks || "";
+    document.getElementById("create-status").value = item.status;
+    createModal.classList.remove("hidden");
+  }
+
+  function closeModal() {
+    createModal.classList.add("hidden");
+    editIdInput.value = "";
+  }
+
   function renderRows(items) {
     if (!items.length) {
       tableBody.innerHTML = '<div class="curriculum-empty">No curricula found.</div>';
@@ -57,7 +117,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         const statusLabel = item.status.charAt(0).toUpperCase() + item.status.slice(1);
 
         return `
-          <div class="curriculum-table-row">
+          <div class="curriculum-table-row" data-id="${item.curriculum_id}" role="button" tabindex="0" aria-label="Edit ${escapeHtml(item.name)}">
             <span class="curriculum-name" data-label="Name">${escapeHtml(item.name)}</span>
             <span data-label="Duration">${formatDuration(item.duration_weeks)}</span>
             <span data-label="Status">
@@ -69,12 +129,24 @@ document.addEventListener("DOMContentLoaded", async function () {
         `;
       })
       .join("");
-  }
 
-  function escapeHtml(text) {
-    const div = document.createElement("div");
-    div.textContent = text;
-    return div.innerHTML;
+    tableBody.querySelectorAll(".curriculum-table-row").forEach(function (row) {
+      const id = row.dataset.id;
+      const item = items.find(function (entry) {
+        return entry.curriculum_id === id;
+      });
+
+      row.addEventListener("click", function () {
+        openEditModal(item);
+      });
+
+      row.addEventListener("keydown", function (event) {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          openEditModal(item);
+        }
+      });
+    });
   }
 
   async function loadCurricula() {
@@ -94,6 +166,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
     try {
       const data = await apiFetch(path);
+      state.items = data.items;
       renderRows(data.items);
     } catch (error) {
       tableBody.innerHTML = "";
@@ -120,19 +193,13 @@ document.addEventListener("DOMContentLoaded", async function () {
     }, 300);
   });
 
-  document.getElementById("create-curriculum-btn").addEventListener("click", function () {
-    hideAlert(createAlert);
-    createForm.reset();
-    createModal.classList.remove("hidden");
-  });
+  document.getElementById("create-curriculum-btn").addEventListener("click", openCreateModal);
 
-  document.getElementById("create-cancel-btn").addEventListener("click", function () {
-    createModal.classList.add("hidden");
-  });
+  document.getElementById("create-cancel-btn").addEventListener("click", closeModal);
 
   createModal.addEventListener("click", function (event) {
     if (event.target === createModal) {
-      createModal.classList.add("hidden");
+      closeModal();
     }
   });
 
@@ -142,28 +209,24 @@ document.addEventListener("DOMContentLoaded", async function () {
     createSubmitBtn.disabled = true;
 
     const formData = new FormData(createForm);
-    const payload = {
-      name: formData.get("name"),
-      status: formData.get("status"),
-    };
-
-    const description = formData.get("description");
-    if (description) {
-      payload.description = description;
-    }
-
-    const duration = formData.get("duration_weeks");
-    if (duration) {
-      payload.duration_weeks = Number(duration);
-    }
+    const curriculumId = editIdInput.value;
+    const isEdit = Boolean(curriculumId);
+    const payload = buildPayload(formData, isEdit);
 
     try {
-      await apiFetch("/curricula/", {
-        method: "POST",
-        body: JSON.stringify(payload),
-      });
+      if (isEdit) {
+        await apiFetch(`/curricula/${curriculumId}`, {
+          method: "PATCH",
+          body: JSON.stringify(payload),
+        });
+      } else {
+        await apiFetch("/curricula/", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+      }
 
-      createModal.classList.add("hidden");
+      closeModal();
       createForm.reset();
       await loadCurricula();
     } catch (error) {
