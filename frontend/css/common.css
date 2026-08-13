@@ -240,6 +240,10 @@ textarea.form-input {
   border: 1px solid #bbf7d0;
 }
 
+.hidden {
+  display: none !important;
+}
+
 .waitlist-form {
   display: flex;
   gap: 0.5rem;
