@@ -162,6 +162,11 @@ footer {
   border-color: var(--gold);
 }
 
+textarea.form-input {
+  resize: vertical;
+  min-height: 80px;
+}
+
 .form-hint {
   font-size: 0.75rem;
   color: var(--olive);

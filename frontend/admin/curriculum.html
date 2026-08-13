@@ -9,24 +9,85 @@
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="../css/common.css" />
   <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="stylesheet" href="../css/curriculum.css" />
 </head>
 <body>
   <div class="app-shell">
     <aside class="sidebar" id="admin-sidebar" aria-label="Admin sidebar"></aside>
 
     <main class="main-content">
-      <header class="page-header">
-        <h1 id="page-title">Curriculum</h1>
-        <p>Manage cooking programs, weeks, and enrollments.</p>
+      <header class="curriculum-toolbar">
+        <div class="curriculum-toolbar-title">
+          <h1>Curriculum</h1>
+          <p>Manage cooking programs, weeks, and enrollments</p>
+        </div>
+        <input
+          class="curriculum-search"
+          type="search"
+          id="curriculum-search"
+          placeholder="Search curricula..."
+          aria-label="Search curricula"
+        />
+        <button class="btn btn-primary" type="button" id="create-curriculum-btn">
+          + CREATE CURRICULUM
+        </button>
       </header>
 
-      <div class="page-body">
-        <div class="dashboard-placeholder">
-          <h2>Curriculum list coming soon</h2>
-          <p>This page will show your curricula table from the Figma design, connected to the API.</p>
+      <div class="page-body curriculum-body">
+        <div id="page-alert" class="alert alert-error hidden" role="alert"></div>
+
+        <div class="filter-chips" role="tablist" aria-label="Filter by status">
+          <button class="filter-chip active" type="button" data-status="">All</button>
+          <button class="filter-chip" type="button" data-status="published">Published</button>
+          <button class="filter-chip" type="button" data-status="draft">Draft</button>
+        </div>
+
+        <div class="curriculum-table" id="curriculum-table">
+          <div class="curriculum-table-header">
+            <span>Name</span>
+            <span>Duration</span>
+            <span>Status</span>
+            <span>Students</span>
+            <span>Updated</span>
+          </div>
+          <div id="curriculum-table-body">
+            <div class="curriculum-loading">Loading curricula...</div>
+          </div>
         </div>
       </div>
     </main>
+  </div>
+
+  <div class="modal-overlay hidden" id="create-modal" role="dialog" aria-modal="true" aria-labelledby="create-modal-title">
+    <div class="modal-card">
+      <h2 id="create-modal-title">Create curriculum</h2>
+      <div id="create-alert" class="alert alert-error hidden" role="alert"></div>
+      <form id="create-curriculum-form">
+        <div class="form-field">
+          <label class="form-label" for="create-name">Name</label>
+          <input class="form-input" type="text" id="create-name" name="name" required />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="create-description">Description</label>
+          <textarea class="form-input" id="create-description" name="description" rows="3"></textarea>
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="create-duration">Duration (weeks)</label>
+          <input class="form-input" type="number" id="create-duration" name="duration_weeks" min="1" />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="create-status">Status</label>
+          <select class="form-input" id="create-status" name="status">
+            <option value="draft">Draft</option>
+            <option value="published">Published</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" type="button" id="create-cancel-btn">Cancel</button>
+          <button class="btn btn-primary" type="submit" id="create-submit-btn">Create</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <script src="../js/config.js"></script>
