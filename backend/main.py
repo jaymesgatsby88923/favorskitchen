@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes.auth import router as auth_router
+from routes.curriculum import router as curriculum_router
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -21,6 +22,7 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
+app.include_router(curriculum_router)
 
 @app.get("/")
 def read_root():

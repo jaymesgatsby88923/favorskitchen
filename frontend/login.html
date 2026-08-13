@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — Favor's Kitchen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/common.css" />
+  <link rel="stylesheet" href="css/auth.css" />
+</head>
+<body>
+  <div class="auth-page">
+    <header class="brand-header">
+      <svg class="logo-mark" viewBox="0 0 100 100" aria-hidden="true">
+        <ellipse cx="50" cy="72" rx="34" ry="10" fill="none" stroke="#6b2c32" stroke-width="2"/>
+        <path d="M22 58 Q22 28 50 28 Q78 28 78 58" fill="none" stroke="#6b2c32" stroke-width="2"/>
+        <path d="M35 28 Q35 8 50 8 Q65 8 65 28" fill="none" stroke="#6b2c32" stroke-width="2"/>
+        <path d="M44 48 C46 54 54 54 56 48" fill="none" stroke="#c9a24a" stroke-width="2"/>
+        <path d="M50 42 V48" stroke="#c9a24a" stroke-width="2"/>
+      </svg>
+      <div class="brand-name">Favor's Kitchen</div>
+      <div class="brand-tagline">COOK • LEARN • ENJOY</div>
+    </header>
+
+    <div class="auth-card">
+      <h1>Sign in</h1>
+      <p class="subtitle">Welcome back to your kitchen journey.</p>
+
+      <div id="form-alert" class="alert alert-error hidden" role="alert"></div>
+
+      <form id="login-form">
+        <div class="form-field">
+          <label class="form-label" for="email">Email</label>
+          <input class="form-input" type="email" id="email" name="email" autocomplete="email" required />
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="password">Password</label>
+          <input class="form-input" type="password" id="password" name="password" autocomplete="current-password" required />
+        </div>
+        <button class="btn btn-primary btn-full" type="submit" id="login-submit">SIGN IN</button>
+      </form>
+
+      <div class="auth-footer">
+        <p><a class="text-link" href="forgot-password.html">Forgot password?</a></p>
+        <p>New student? <a class="text-link" href="register.html">Create an account</a></p>
+        <p><a class="text-link" href="index.html">Back to home</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/common.js"></script>
+  <script src="js/login.js"></script>
+</body>
+</html>

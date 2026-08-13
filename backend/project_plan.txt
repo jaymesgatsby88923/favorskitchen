@@ -1,0 +1,127 @@
+Based on your product doc, schema, and V1 focus on curriculum management, here’s a practical page map — ordered by what to build first, not everything at once.
+
+V1 first (Admin — Curriculum core)
+These are the pages you need to launch the first real workflow.
+
+Page	Purpose
+Login
+Supabase Auth sign-in
+Curriculum List
+See all curricula, search/filter by status, create new, open one
+Create Curriculum
+Name, description, duration, cover image, status (draft/published) — can be a modal instead of a full page
+Curriculum Detail
+Hub for one curriculum: info, weeks, classes, recipes, enrollment summary
+Create / Edit Week
+Week number, title, description, publish status — modal or sub-page under Curriculum Detail
+Week Detail (optional early)
+Recipes + classes for that week — or fold this into Curriculum Detail tabs
+Create / Edit Class Session
+Name, type (virtual/in-person), schedule, max students, meeting URL/location
+Recipe Library List
+Reusable recipes (not tied to one curriculum)
+Create / Edit Recipe
+Recipe info + ingredients/instructions
+Ingredient Library (simple)
+Reusable ingredients — can start as inline search/autocomplete on recipe form
+Attach Recipe to Week
+Pick from library, set sort order — modal on Week Detail
+Students List
+View students (read-only for V1 is fine)
+Enrollments on Curriculum Detail
+See who’s enrolled, add/remove enrollment — modal or tab first
+Settings / Profile
+Own account: name, email, password
+For V1, Curriculum Detail can be one page with tabs:
+
+Overview | Weeks | Classes | Recipes | Students
+That avoids building 5 separate top-level pages too early.
+
+V1.5 (Admin — fill gaps)
+Page	Purpose
+Class List (global)
+All upcoming sessions across curricula — useful for scheduling
+Student Detail
+One student’s enrollments and progress
+Create Student / Invite
+Add student account or send invite
+Publish controls
+Draft vs published for curriculum, weeks, recipes — may live as actions, not a page
+Instructor pages (after admin curriculum works)
+Page	Purpose
+Instructor Dashboard (light)
+Upcoming classes, not full admin dashboard
+My Classes
+Assigned sessions only
+Class Detail
+Schedule, location/URL, enrolled students, recipes for that week
+Curriculum View (read-only)
+Content for classes they teach
+You’ll likely need instructor_id on class_sessions (or a join table) before these are meaningful.
+
+Student pages (after enrollments work)
+Page	Purpose
+Student Home
+Enrolled program + next class
+My Curriculum
+Weeks and progress through enrolled curriculum
+Class Detail
+When/where, what’s being taught
+Recipe Detail
+Instructions, ingredients, PDF/image — only for enrolled content
+My Profile
+Basic account info
+Students probably don’t need Curriculum List, Recipe Library, or admin create/edit screens.
+
+Dashboard (build last)
+Page	Purpose
+Admin Dashboard
+Summary cards: active curricula, upcoming classes, total students, draft content
+Pull from data already managed elsewhere — don’t make it the primary workspace.
+
+Suggested navigation (admin app)
+Curriculum   ← start here (V1 home)
+Recipes
+Classes      ← can wait until after Curriculum Detail
+Students
+Settings
+Dashboard    ← last
+For MVP, Curriculum can be the default landing page after login instead of a dashboard.
+
+What you can skip or defer
+Skip for now	Why
+Full Dashboard
+Your doc says not first
+Separate page per CRUD action
+Use modals/drawers for create/edit
+Instructor + Student portals
+Build admin curriculum path first
+Progress tracking / completion certificates
+Schema supports completed_at later
+Public marketing site
+This is the admin/education app
+Generic “Ingredients admin”
+Inline on recipe form until library grows
+Minimum page count to ship “Curriculum management”
+If you want the smallest useful set:
+
+Login
+Curriculum List
+Curriculum Detail (tabs: Overview, Weeks, Classes, Recipes, Students)
+Recipe List + Recipe Create/Edit
+Settings
+That’s 5 routes (+ modals for weeks, classes, enrollments, attach recipe).
+
+Role-based routing (later)
+One app with role-based nav is enough for MVP:
+
+Role	Sees
+admin
+Curriculum, Recipes, Classes, Students, Settings
+instructor
+My Classes, Class Detail, read-only curriculum content
+student
+My Curriculum, Classes, Recipes (enrolled only), Profile
+Bottom line: Start with Login → Curriculum List → Curriculum Detail as the spine. Add Recipe Library because weeks attach reusable recipes. Push Dashboard, instructor portal, and student portal until admin can create and manage a full curriculum end-to-end.
+
+If you want, I can next sketch a screen-by-screen wireframe flow for just those 5 V1 routes (what’s on each tab and which modals open from where).

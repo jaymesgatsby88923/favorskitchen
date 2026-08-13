@@ -1,0 +1,73 @@
+.student-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.student-header {
+  background: var(--burgundy);
+  color: var(--white);
+  padding: 1rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.student-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.student-header .logo-mark {
+  width: 40px;
+  height: 40px;
+  margin: 0;
+}
+
+.student-header .brand-name {
+  font-family: "Great Vibes", cursive;
+  font-size: 1.5rem;
+  color: var(--gold-light);
+}
+
+.student-header-actions button {
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: var(--white);
+  padding: 0.45rem 0.85rem;
+  border-radius: 4px;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.student-header-actions button:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.student-main {
+  flex: 1;
+  padding: 2rem;
+}
+
+.welcome-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 2rem;
+  max-width: 560px;
+}
+
+.welcome-card h1 {
+  font-size: 1.5rem;
+  color: var(--burgundy);
+  margin-bottom: 0.5rem;
+}
+
+.welcome-card p {
+  color: var(--olive);
+  line-height: 1.6;
+}

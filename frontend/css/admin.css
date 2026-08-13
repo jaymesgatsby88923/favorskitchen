@@ -1,0 +1,155 @@
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: var(--burgundy);
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 0;
+}
+
+.sidebar-brand {
+  text-align: center;
+  padding: 0 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.sidebar-brand .logo-mark {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 0.5rem;
+}
+
+.sidebar-brand .brand-name {
+  font-family: "Great Vibes", cursive;
+  font-size: 1.6rem;
+  color: var(--gold-light);
+  line-height: 1.1;
+}
+
+.sidebar-brand .brand-tagline {
+  font-size: 0.55rem;
+  letter-spacing: 0.22em;
+  color: rgba(255, 255, 255, 0.75);
+  margin-top: 0.35rem;
+}
+
+.sidebar-brand .brand-tagline::before,
+.sidebar-brand .brand-tagline::after {
+  width: 24px;
+  background: var(--gold);
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 1.25rem 0;
+}
+
+.sidebar-nav a {
+  display: block;
+  padding: 0.65rem 1.5rem;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.sidebar-nav a:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--white);
+}
+
+.sidebar-nav a.active {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--gold-light);
+  border-left: 3px solid var(--gold);
+  padding-left: calc(1.5rem - 3px);
+}
+
+.sidebar-footer {
+  padding: 1rem 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.sidebar-footer a,
+.sidebar-footer button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.65rem 1.5rem;
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: none;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.sidebar-footer a:hover,
+.sidebar-footer button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.main-content {
+  flex: 1;
+  background: var(--cream);
+  overflow: auto;
+}
+
+.page-header {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 1.5rem 2rem;
+}
+
+.page-header h1 {
+  font-size: 1.75rem;
+  color: var(--burgundy);
+  margin-bottom: 0.25rem;
+}
+
+.page-header p {
+  font-size: 0.9rem;
+  color: var(--olive);
+}
+
+.page-body {
+  padding: 2rem;
+}
+
+.dashboard-placeholder {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 2rem;
+  max-width: 640px;
+}
+
+.dashboard-placeholder h2 {
+  font-size: 1.15rem;
+  color: var(--burgundy);
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-placeholder p {
+  color: var(--olive);
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .app-shell {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
+}

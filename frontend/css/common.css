@@ -7,6 +7,9 @@
   --olive: #6f7445;
   --charcoal: #2f2f2f;
   --white: #ffffff;
+  --border: #e5e7eb;
+  --error: #b91c1c;
+  --success: #15803d;
 }
 
 * {
@@ -27,9 +30,10 @@ body {
   margin: 0 auto;
 }
 
-header {
+/* Brand header (auth + marketing) */
+.brand-header {
   text-align: center;
-  padding: 2.5rem 1rem 1rem;
+  padding: 2rem 1rem 1rem;
 }
 
 .logo-mark {
@@ -63,6 +67,12 @@ header {
   width: 42px;
   height: 1px;
   background: var(--gold);
+}
+
+/* Index.html header alias */
+header {
+  text-align: center;
+  padding: 2.5rem 1rem 1rem;
 }
 
 .section-title {
@@ -122,6 +132,109 @@ footer {
   padding: 1.5rem 0;
 }
 
+/* Forms & buttons (shared) */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--olive);
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--white);
+  font: inherit;
+  color: var(--charcoal);
+}
+
+.form-input:focus {
+  outline: 2px solid rgba(201, 162, 74, 0.45);
+  border-color: var(--gold);
+}
+
+.form-hint {
+  font-size: 0.75rem;
+  color: var(--olive);
+}
+
+.form-error {
+  font-size: 0.8rem;
+  color: var(--error);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 4px;
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.btn-primary {
+  background: var(--gold);
+  color: var(--burgundy-dark);
+}
+
+.btn-primary:hover {
+  background: var(--gold-light);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-full {
+  width: 100%;
+}
+
+.text-link {
+  color: var(--burgundy);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.text-link:hover {
+  text-decoration: underline;
+}
+
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.alert-error {
+  background: #fef2f2;
+  color: var(--error);
+  border: 1px solid #fecaca;
+}
+
+.alert-success {
+  background: #f0fdf4;
+  color: var(--success);
+  border: 1px solid #bbf7d0;
+}
+
 .waitlist-form {
   display: flex;
   gap: 0.5rem;
@@ -153,4 +266,20 @@ footer {
 
 .waitlist-form button:hover {
   background: var(--gold-light);
+}
+
+.site-login-link {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 0.85rem;
+}
+
+.site-login-link a {
+  color: var(--gold-light);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.site-login-link a:hover {
+  text-decoration: underline;
 }

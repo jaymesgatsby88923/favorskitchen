@@ -1,16 +1,26 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
-from datetime import date
+
 
 class SignUpRequest(BaseModel):
-    display_name: str
+    first_name: str = Field(..., min_length=1)
+    last_name: str = Field(..., min_length=1)
     email: EmailStr
-    password: str
-    parent_type: Optional[str] = None
-    birth_date: Optional[date] = None
-    due_date: Optional[date] = None
+    password: str = Field(..., min_length=6)
+    phone: Optional[str] = None
+
 
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
 
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+    redirect_to: str
+
+
+class ResetPasswordRequest(BaseModel):
+    access_token: str
+    refresh_token: str
+    password: str = Field(..., min_length=6)
