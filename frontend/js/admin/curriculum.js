@@ -39,21 +39,6 @@ document.addEventListener("DOMContentLoaded", async function () {
     return String(count);
   }
 
-  function formatDate(isoString) {
-    const date = new Date(isoString);
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  }
-
-  function escapeHtml(text) {
-    const div = document.createElement("div");
-    div.textContent = text;
-    return div.innerHTML;
-  }
-
   function buildPayload(formData, isEdit) {
     const payload = {
       name: formData.get("name"),
@@ -107,7 +92,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   function renderRows(items) {
     if (!items.length) {
-      tableBody.innerHTML = '<div class="curriculum-empty">No curricula found.</div>';
+      tableBody.innerHTML = '<div class="data-table-empty">No curricula found.</div>';
       return;
     }
 
@@ -117,8 +102,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         const statusLabel = item.status.charAt(0).toUpperCase() + item.status.slice(1);
 
         return `
-          <div class="curriculum-table-row" data-id="${item.curriculum_id}" role="button" tabindex="0" aria-label="Edit ${escapeHtml(item.name)}">
-            <span class="curriculum-name" data-label="Name">${escapeHtml(item.name)}</span>
+          <div class="data-table-row" data-id="${item.curriculum_id}" role="button" tabindex="0" aria-label="Edit ${escapeHtml(item.name)}">
+            <span class="data-table-primary" data-label="Name">${escapeHtml(item.name)}</span>
             <span data-label="Duration">${formatDuration(item.duration_weeks)}</span>
             <span data-label="Status">
               <span class="status-badge ${statusClass}">${statusLabel}</span>
@@ -130,7 +115,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       })
       .join("");
 
-    tableBody.querySelectorAll(".curriculum-table-row").forEach(function (row) {
+    tableBody.querySelectorAll(".data-table-row").forEach(function (row) {
       const id = row.dataset.id;
       const item = items.find(function (entry) {
         return entry.curriculum_id === id;
@@ -151,7 +136,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   async function loadCurricula() {
     hideAlert(pageAlert);
-    tableBody.innerHTML = '<div class="curriculum-loading">Loading curricula...</div>';
+    tableBody.innerHTML = '<div class="data-table-loading">Loading curricula...</div>';
 
     const params = new URLSearchParams();
     if (state.search) {
@@ -174,15 +159,9 @@ document.addEventListener("DOMContentLoaded", async function () {
     }
   }
 
-  filterChips.forEach(function (chip) {
-    chip.addEventListener("click", function () {
-      filterChips.forEach(function (c) {
-        c.classList.remove("active");
-      });
-      chip.classList.add("active");
-      state.status = chip.dataset.status || "";
-      loadCurricula();
-    });
+  bindFilterChips(filterChips, function (chip) {
+    state.status = chip.dataset.status || "";
+    loadCurricula();
   });
 
   searchInput.addEventListener("input", function () {
@@ -197,11 +176,7 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   document.getElementById("create-cancel-btn").addEventListener("click", closeModal);
 
-  createModal.addEventListener("click", function (event) {
-    if (event.target === createModal) {
-      closeModal();
-    }
-  });
+  bindModalDismiss(createModal, closeModal);
 
   createForm.addEventListener("submit", async function (event) {
     event.preventDefault();

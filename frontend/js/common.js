@@ -126,7 +126,7 @@ function renderAdminSidebar(container, activePage) {
   const navItems = [
     { id: "dashboard", label: "Dashboard", href: "dashboard.html" },
     { id: "curriculum", label: "Curriculum", href: "curriculum.html" },
-    { id: "recipes", label: "Recipes", href: "#" },
+    { id: "recipes", label: "Recipes", href: "recipes.html" },
     { id: "classes", label: "Classes", href: "#" },
     { id: "students", label: "Students", href: "#" },
   ];
@@ -166,6 +166,206 @@ function showAlert(container, message, type = "error") {
 function hideAlert(container) {
   container.classList.add("hidden");
   container.textContent = "";
+}
+
+function escapeHtml(text) {
+  const div = document.createElement("div");
+  div.textContent = text == null ? "" : String(text);
+  return div.innerHTML;
+}
+
+function formatDate(isoString) {
+  const date = new Date(isoString);
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function formatMinutes(minutes) {
+  if (!minutes) {
+    return "—";
+  }
+  return `${minutes} min`;
+}
+
+function debounce(fn, delay) {
+  let timeoutId;
+  return function debounced(...args) {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(function () {
+      fn.apply(this, args);
+    }, delay);
+  };
+}
+
+function bindModalDismiss(overlay, closeFn) {
+  overlay.addEventListener("click", function (event) {
+    if (event.target === overlay) {
+      closeFn();
+    }
+  });
+}
+
+function bindFilterChips(chips, onChange) {
+  chips.forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      chips.forEach(function (entry) {
+        entry.classList.remove("active");
+      });
+      chip.classList.add("active");
+      onChange(chip);
+    });
+  });
+}
+
+function initIngredientCombobox(root) {
+  const input = root.querySelector(".ingredient-combobox-input");
+  const menu = root.querySelector(".ingredient-combobox-menu");
+  const idInput = root.querySelector(".ingredient-combobox-id");
+  let selected = { ingredient_id: "", name: "" };
+
+  function closeMenu() {
+    menu.classList.add("hidden");
+  }
+
+  function openMenu() {
+    menu.classList.remove("hidden");
+  }
+
+  function setSelection(nextSelection) {
+    selected = {
+      ingredient_id: nextSelection.ingredient_id || "",
+      name: nextSelection.name || "",
+    };
+    idInput.value = selected.ingredient_id;
+    input.value = selected.name;
+    closeMenu();
+  }
+
+  function clearSelection() {
+    selected = { ingredient_id: "", name: "" };
+    idInput.value = "";
+    input.value = "";
+    menu.innerHTML = "";
+    closeMenu();
+  }
+
+  function renderMenu(items, query) {
+    const trimmedQuery = query.trim();
+    let html = "";
+
+    if (!trimmedQuery) {
+      menu.innerHTML = '<div class="ingredient-combobox-empty">Type to search ingredients</div>';
+      openMenu();
+      return;
+    }
+
+    if (items.length) {
+      html += items
+        .map(function (item) {
+          const category = item.category
+            ? `<span class="ingredient-combobox-option-meta">${escapeHtml(item.category)}</span>`
+            : "";
+          return `
+            <button type="button" class="ingredient-combobox-option" data-id="${item.ingredient_id}">
+              <span class="ingredient-combobox-option-name">${escapeHtml(item.name)}</span>
+              ${category}
+            </button>
+          `;
+        })
+        .join("");
+    } else {
+      html += '<div class="ingredient-combobox-empty">No matches found</div>';
+    }
+
+    html += `
+      <button type="button" class="ingredient-combobox-create" data-create="true">
+        + Create "${escapeHtml(trimmedQuery)}"
+      </button>
+    `;
+
+    menu.innerHTML = html;
+    openMenu();
+
+    menu.querySelectorAll(".ingredient-combobox-option").forEach(function (option) {
+      option.addEventListener("click", function () {
+        setSelection({
+          ingredient_id: option.dataset.id,
+          name: option.querySelector(".ingredient-combobox-option-name").textContent,
+        });
+      });
+    });
+
+    const createButton = menu.querySelector(".ingredient-combobox-create");
+    if (createButton) {
+      createButton.addEventListener("click", async function () {
+        try {
+          createButton.disabled = true;
+          const created = await apiFetch("/ingredients/", {
+            method: "POST",
+            body: JSON.stringify({ name: trimmedQuery }),
+          });
+          setSelection({
+            ingredient_id: created.ingredient_id,
+            name: created.name,
+          });
+        } catch (error) {
+          menu.innerHTML = `<div class="ingredient-combobox-empty">${escapeHtml(error.message)}</div>`;
+          openMenu();
+        }
+      });
+    }
+  }
+
+  const searchIngredients = debounce(async function () {
+    const query = input.value.trim();
+    selected = { ingredient_id: "", name: query };
+    idInput.value = "";
+
+    if (!query) {
+      menu.innerHTML = "";
+      closeMenu();
+      return;
+    }
+
+    menu.innerHTML = '<div class="ingredient-combobox-loading">Searching...</div>';
+    openMenu();
+
+    try {
+      const params = new URLSearchParams({ search: query, limit: "20" });
+      const data = await apiFetch(`/ingredients/?${params.toString()}`);
+      renderMenu(data.items, query);
+    } catch (error) {
+      menu.innerHTML = `<div class="ingredient-combobox-empty">${escapeHtml(error.message)}</div>`;
+      openMenu();
+    }
+  }, 300);
+
+  input.addEventListener("input", searchIngredients);
+  input.addEventListener("focus", function () {
+    if (input.value.trim()) {
+      searchIngredients();
+    }
+  });
+
+  document.addEventListener("click", function (event) {
+    if (!root.contains(event.target)) {
+      closeMenu();
+    }
+  });
+
+  return {
+    getSelection: function () {
+      return {
+        ingredient_id: idInput.value || null,
+        name: input.value.trim() || null,
+      };
+    },
+    setSelection: setSelection,
+    clear: clearSelection,
+  };
 }
 
 function getResetPasswordUrl() {

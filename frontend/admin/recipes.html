@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recipes — Favor's Kitchen</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/common.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
+  <link rel="stylesheet" href="../css/recipes.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" id="admin-sidebar" aria-label="Admin sidebar"></aside>
+
+    <main class="main-content">
+      <header class="admin-toolbar">
+        <div class="admin-toolbar-title">
+          <h1>Recipes</h1>
+          <p>Manage reusable recipes for your programs</p>
+        </div>
+        <input
+          class="admin-search"
+          type="search"
+          id="recipe-search"
+          placeholder="Search recipes..."
+          aria-label="Search recipes"
+        />
+        <button class="btn btn-primary" type="button" id="create-recipe-btn">
+          + CREATE RECIPE
+        </button>
+      </header>
+
+      <div class="page-body">
+        <div id="page-alert" class="alert alert-error hidden" role="alert"></div>
+
+        <div class="filter-chips" role="tablist" aria-label="Filter by status">
+          <button class="filter-chip active" type="button" data-filter="status" data-value="">All</button>
+          <button class="filter-chip" type="button" data-filter="status" data-value="published">Published</button>
+          <button class="filter-chip" type="button" data-filter="status" data-value="draft">Draft</button>
+        </div>
+
+        <div class="filter-chips" role="tablist" aria-label="Filter by active state">
+          <button class="filter-chip active" type="button" data-filter="active" data-value="">All</button>
+          <button class="filter-chip" type="button" data-filter="active" data-value="true">Active</button>
+          <button class="filter-chip" type="button" data-filter="active" data-value="false">Inactive</button>
+        </div>
+
+        <div class="data-table data-table--recipes" id="recipe-table">
+          <div class="data-table-header">
+            <span>Name</span>
+            <span>Prep</span>
+            <span>Cook</span>
+            <span>Servings</span>
+            <span>Status</span>
+            <span>Active</span>
+            <span>Updated</span>
+          </div>
+          <div id="recipe-table-body">
+            <div class="data-table-loading">Loading recipes...</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-overlay hidden" id="recipe-modal" role="dialog" aria-modal="true" aria-labelledby="recipe-modal-title">
+    <div class="modal-card modal-card-wide">
+      <h2 id="recipe-modal-title">Create recipe</h2>
+      <div id="recipe-alert" class="alert alert-error hidden" role="alert"></div>
+      <form id="recipe-form">
+        <input type="hidden" id="edit-recipe-id" value="" />
+
+        <div class="form-field">
+          <label class="form-label" for="recipe-name">Name</label>
+          <input class="form-input" type="text" id="recipe-name" name="name" required />
+        </div>
+
+        <div class="form-field">
+          <label class="form-label" for="recipe-description">Description</label>
+          <textarea class="form-input" id="recipe-description" name="description" rows="2"></textarea>
+        </div>
+
+        <div class="form-row form-row-3">
+          <div class="form-field">
+            <label class="form-label" for="recipe-prep">Prep (minutes)</label>
+            <input class="form-input" type="number" id="recipe-prep" name="prep_time_minutes" min="1" />
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="recipe-cook">Cook (minutes)</label>
+            <input class="form-input" type="number" id="recipe-cook" name="cook_time_minutes" min="1" />
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="recipe-servings">Servings</label>
+            <input class="form-input" type="number" id="recipe-servings" name="servings" min="1" />
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label class="form-label" for="recipe-instructions">Instructions</label>
+          <textarea class="form-input" id="recipe-instructions" name="instructions" rows="4"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label class="form-label" for="recipe-image-url">Image URL</label>
+            <input class="form-input" type="url" id="recipe-image-url" name="image_url" />
+          </div>
+          <div class="form-field">
+            <label class="form-label" for="recipe-pdf-url">PDF URL</label>
+            <input class="form-input" type="url" id="recipe-pdf-url" name="pdf_url" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-field">
+            <label class="form-label" for="recipe-status">Status</label>
+            <select class="form-input" id="recipe-status" name="status">
+              <option value="draft">Draft</option>
+              <option value="published">Published</option>
+            </select>
+          </div>
+          <div class="checkbox-field">
+            <input type="checkbox" id="recipe-active" name="active" checked />
+            <label for="recipe-active">Active</label>
+          </div>
+        </div>
+
+        <div class="section-heading">
+          <h3>Ingredients</h3>
+          <button class="btn btn-secondary" type="button" id="add-ingredient-row-btn">+ Add ingredient</button>
+        </div>
+
+        <div class="ingredient-rows" id="ingredient-rows"></div>
+
+        <div class="modal-actions modal-actions-split">
+          <button class="btn btn-danger hidden" type="button" id="delete-recipe-btn">Delete recipe</button>
+          <div class="modal-actions">
+            <button class="btn btn-secondary" type="button" id="recipe-cancel-btn">Cancel</button>
+            <button class="btn btn-primary" type="submit" id="recipe-submit-btn">Create</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <template id="ingredient-row-template">
+    <div class="ingredient-row">
+      <div class="ingredient-combobox" data-ingredient-combobox>
+        <input type="hidden" class="ingredient-combobox-id" value="" />
+        <input
+          type="text"
+          class="ingredient-combobox-input form-input"
+          placeholder="Search ingredients..."
+          autocomplete="off"
+          aria-label="Ingredient"
+        />
+        <div class="ingredient-combobox-menu hidden" role="listbox"></div>
+      </div>
+      <input class="form-input ingredient-qty" type="number" step="any" min="0" placeholder="Qty" aria-label="Quantity" />
+      <input class="form-input ingredient-unit" type="text" placeholder="Unit" aria-label="Unit" />
+      <input class="form-input ingredient-prep" type="text" placeholder="Prep" aria-label="Preparation" />
+      <input class="form-input ingredient-notes" type="text" placeholder="Notes" aria-label="Notes" />
+      <button class="btn btn-secondary ingredient-row-remove" type="button" aria-label="Remove ingredient">&times;</button>
+    </div>
+  </template>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/common.js"></script>
+  <script src="../js/admin/recipes.js"></script>
+</body>
+</html>

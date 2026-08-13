@@ -16,13 +16,13 @@
     <aside class="sidebar" id="admin-sidebar" aria-label="Admin sidebar"></aside>
 
     <main class="main-content">
-      <header class="curriculum-toolbar">
-        <div class="curriculum-toolbar-title">
+      <header class="admin-toolbar">
+        <div class="admin-toolbar-title">
           <h1>Curriculum</h1>
           <p>Manage cooking programs, weeks, and enrollments</p>
         </div>
         <input
-          class="curriculum-search"
+          class="admin-search"
           type="search"
           id="curriculum-search"
           placeholder="Search curricula..."
@@ -33,7 +33,7 @@
         </button>
       </header>
 
-      <div class="page-body curriculum-body">
+      <div class="page-body">
         <div id="page-alert" class="alert alert-error hidden" role="alert"></div>
 
         <div class="filter-chips" role="tablist" aria-label="Filter by status">
@@ -42,8 +42,8 @@
           <button class="filter-chip" type="button" data-status="draft">Draft</button>
         </div>
 
-        <div class="curriculum-table" id="curriculum-table">
-          <div class="curriculum-table-header">
+        <div class="data-table data-table--curriculum" id="curriculum-table">
+          <div class="data-table-header">
             <span>Name</span>
             <span>Duration</span>
             <span>Status</span>
@@ -51,7 +51,7 @@
             <span>Updated</span>
           </div>
           <div id="curriculum-table-body">
-            <div class="curriculum-loading">Loading curricula...</div>
+            <div class="data-table-loading">Loading curricula...</div>
           </div>
         </div>
       </div>
