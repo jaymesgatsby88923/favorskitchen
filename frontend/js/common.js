@@ -1,9 +1,5 @@
 const FK = {
-  API_BASE_URL:
-    window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-      ? "http://127.0.0.1:8000"
-      : "https://api.favorskitchen.com",
-
+  API_BASE_URL: window.FK_CONFIG.API_BASE_URL,
   ACCESS_TOKEN_KEY: "fk_access_token",
   REFRESH_TOKEN_KEY: "fk_refresh_token",
 };
