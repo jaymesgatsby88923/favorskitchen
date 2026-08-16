@@ -98,11 +98,6 @@
           </div>
         </div>
 
-        <div class="form-field">
-          <label class="form-label" for="recipe-instructions">Instructions</label>
-          <textarea class="form-input" id="recipe-instructions" name="instructions" rows="4"></textarea>
-        </div>
-
         <div class="form-row">
           <div class="form-field">
             <label class="form-label" for="recipe-image-url">Image URL</label>
@@ -129,6 +124,13 @@
         </div>
 
         <div class="section-heading">
+          <h3>Steps</h3>
+          <button class="btn btn-secondary" type="button" id="add-step-row-btn">+ Add step</button>
+        </div>
+
+        <div class="step-rows" id="step-rows"></div>
+
+        <div class="section-heading">
           <h3>Ingredients</h3>
           <button class="btn btn-secondary" type="button" id="add-ingredient-row-btn">+ Add ingredient</button>
         </div>
@@ -145,6 +147,18 @@
       </form>
     </div>
   </div>
+
+  <template id="step-row-template">
+    <div class="step-row">
+      <span class="step-row-number" aria-hidden="true">1</span>
+      <textarea class="form-input step-row-description" rows="2" placeholder="Describe this step..." aria-label="Step description"></textarea>
+      <div class="step-row-actions">
+        <button class="btn btn-secondary step-row-up" type="button" aria-label="Move step up">&uarr;</button>
+        <button class="btn btn-secondary step-row-down" type="button" aria-label="Move step down">&darr;</button>
+        <button class="btn btn-secondary step-row-remove" type="button" aria-label="Remove step">&times;</button>
+      </div>
+    </div>
+  </template>
 
   <template id="ingredient-row-template">
     <div class="ingredient-row">

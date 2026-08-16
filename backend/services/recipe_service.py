@@ -10,13 +10,15 @@ from models.recipe import (
     RecipeListItem,
     RecipeListResponse,
     RecipeResponse,
+    RecipeStepInput,
+    RecipeStepLine,
     RecipeUpdate,
 )
 from services import ingredient_service
 
 RECIPE_FIELDS = (
     "recipe_id, name, description, prep_time_minutes, cook_time_minutes, "
-    "servings, instructions, image_url, pdf_url, status, active, "
+    "servings, image_url, pdf_url, status, active, "
     "created_at, updated_at"
 )
 
@@ -28,6 +30,10 @@ RECIPE_LIST_FIELDS = (
 INGREDIENT_LINE_FIELDS = (
     "recipe_ingredient_id, ingredient_id, quantity, unit, preparation, "
     "notes, sort_order, ingredients(name, category)"
+)
+
+STEP_LINE_FIELDS = (
+    "step_id, recipe_id, description, sort_order, created_at, updated_at"
 )
 
 
@@ -54,11 +60,25 @@ def _fetch_recipe_ingredients(recipe_id: UUID) -> list[RecipeIngredientLine]:
     return lines
 
 
+def _fetch_recipe_steps(recipe_id: UUID) -> list[RecipeStepLine]:
+    response = (
+        admin_supabase
+        .table("recipe_steps")
+        .select(STEP_LINE_FIELDS)
+        .eq("recipe_id", str(recipe_id))
+        .order("sort_order")
+        .execute()
+    )
+
+    return [RecipeStepLine(**row) for row in response.data]
+
+
 def _build_recipe_response(row: dict) -> RecipeResponse:
     recipe_id = row["recipe_id"]
     return RecipeResponse(
         **row,
         ingredients=_fetch_recipe_ingredients(recipe_id),
+        steps=_fetch_recipe_steps(recipe_id),
     )
 
 
@@ -94,6 +114,32 @@ def _replace_ingredient_lines(recipe_id: UUID, ingredients: list[RecipeIngredien
         str(recipe_id),
     ).execute()
     _insert_ingredient_lines(recipe_id, ingredients)
+
+
+def _insert_step_lines(recipe_id: UUID, steps: list[RecipeStepInput]) -> None:
+    if not steps:
+        return
+
+    rows = [
+        {
+            "recipe_id": str(recipe_id),
+            "description": step.description,
+            "sort_order": step.sort_order,
+        }
+        for step in steps
+    ]
+
+    response = admin_supabase.table("recipe_steps").insert(rows).execute()
+    if not response.data:
+        raise HTTPException(status_code=400, detail="Failed to save recipe steps")
+
+
+def _replace_step_lines(recipe_id: UUID, steps: list[RecipeStepInput]) -> None:
+    admin_supabase.table("recipe_steps").delete().eq(
+        "recipe_id",
+        str(recipe_id),
+    ).execute()
+    _insert_step_lines(recipe_id, steps)
 
 
 def list_recipes(
@@ -141,7 +187,7 @@ def get_recipe(recipe_id: UUID) -> RecipeResponse:
 
 
 def create_recipe(payload: RecipeCreate) -> RecipeResponse:
-    recipe_data = payload.model_dump(exclude={"ingredients"})
+    recipe_data = payload.model_dump(exclude={"ingredients", "steps"})
     response = admin_supabase.table("recipes").insert(recipe_data).execute()
 
     if not response.data:
@@ -149,12 +195,13 @@ def create_recipe(payload: RecipeCreate) -> RecipeResponse:
 
     recipe_id = response.data[0]["recipe_id"]
     _insert_ingredient_lines(recipe_id, payload.ingredients)
+    _insert_step_lines(recipe_id, payload.steps)
 
     return get_recipe(recipe_id)
 
 
 def update_recipe(recipe_id: UUID, payload: RecipeUpdate) -> RecipeResponse:
-    updates = payload.model_dump(exclude_unset=True, exclude={"ingredients"})
+    updates = payload.model_dump(exclude_unset=True, exclude={"ingredients", "steps"})
 
     if updates:
         response = (
@@ -166,10 +213,10 @@ def update_recipe(recipe_id: UUID, payload: RecipeUpdate) -> RecipeResponse:
         )
         if not response.data:
             raise HTTPException(status_code=404, detail="Recipe not found")
-    elif payload.ingredients is None:
+    elif payload.ingredients is None and payload.steps is None:
         return get_recipe(recipe_id)
 
-    if payload.ingredients is not None:
+    if payload.ingredients is not None or payload.steps is not None:
         existing = (
             admin_supabase
             .table("recipes")
@@ -179,7 +226,12 @@ def update_recipe(recipe_id: UUID, payload: RecipeUpdate) -> RecipeResponse:
         )
         if not existing.data:
             raise HTTPException(status_code=404, detail="Recipe not found")
+
+    if payload.ingredients is not None:
         _replace_ingredient_lines(recipe_id, payload.ingredients)
+
+    if payload.steps is not None:
+        _replace_step_lines(recipe_id, payload.steps)
 
     return get_recipe(recipe_id)
 
@@ -213,6 +265,10 @@ def delete_recipe(recipe_id: UUID) -> None:
         )
 
     admin_supabase.table("recipe_ingredients").delete().eq(
+        "recipe_id",
+        str(recipe_id),
+    ).execute()
+    admin_supabase.table("recipe_steps").delete().eq(
         "recipe_id",
         str(recipe_id),
     ).execute()

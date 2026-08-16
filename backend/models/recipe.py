@@ -8,6 +8,11 @@ from pydantic import BaseModel, Field, model_validator
 RecipeStatus = Literal["draft", "published"]
 
 
+class RecipeStepInput(BaseModel):
+    description: str = Field(..., min_length=1)
+    sort_order: int = 0
+
+
 class RecipeIngredientInput(BaseModel):
     ingredient_id: Optional[UUID] = None
     name: Optional[str] = Field(None, min_length=1)
@@ -31,12 +36,12 @@ class RecipeCreate(BaseModel):
     prep_time_minutes: Optional[int] = Field(None, ge=1)
     cook_time_minutes: Optional[int] = Field(None, ge=1)
     servings: Optional[int] = Field(None, ge=1)
-    instructions: Optional[str] = None
     image_url: Optional[str] = None
     pdf_url: Optional[str] = None
     status: RecipeStatus = "draft"
     active: bool = True
     ingredients: list[RecipeIngredientInput] = Field(default_factory=list)
+    steps: list[RecipeStepInput] = Field(default_factory=list)
 
 
 class RecipeUpdate(BaseModel):
@@ -45,12 +50,21 @@ class RecipeUpdate(BaseModel):
     prep_time_minutes: Optional[int] = Field(None, ge=1)
     cook_time_minutes: Optional[int] = Field(None, ge=1)
     servings: Optional[int] = Field(None, ge=1)
-    instructions: Optional[str] = None
     image_url: Optional[str] = None
     pdf_url: Optional[str] = None
     status: Optional[RecipeStatus] = None
     active: Optional[bool] = None
     ingredients: Optional[list[RecipeIngredientInput]] = None
+    steps: Optional[list[RecipeStepInput]] = None
+
+
+class RecipeStepLine(BaseModel):
+    step_id: UUID
+    recipe_id: UUID
+    description: str
+    sort_order: int
+    created_at: datetime
+    updated_at: datetime
 
 
 class RecipeIngredientLine(BaseModel):
@@ -72,7 +86,6 @@ class RecipeResponse(BaseModel):
     prep_time_minutes: Optional[int] = None
     cook_time_minutes: Optional[int] = None
     servings: Optional[int] = None
-    instructions: Optional[str] = None
     image_url: Optional[str] = None
     pdf_url: Optional[str] = None
     status: RecipeStatus
@@ -80,6 +93,7 @@ class RecipeResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
     ingredients: list[RecipeIngredientLine] = Field(default_factory=list)
+    steps: list[RecipeStepLine] = Field(default_factory=list)
 
 
 class RecipeListItem(BaseModel):

@@ -27,6 +27,8 @@ document.addEventListener("DOMContentLoaded", async function () {
   const deleteRecipeBtn = document.getElementById("delete-recipe-btn");
   const ingredientRows = document.getElementById("ingredient-rows");
   const ingredientRowTemplate = document.getElementById("ingredient-row-template");
+  const stepRows = document.getElementById("step-rows");
+  const stepRowTemplate = document.getElementById("step-row-template");
 
   const comboboxControllers = new Map();
   let searchTimeout;
@@ -50,6 +52,75 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   function destroyComboboxes() {
     comboboxControllers.clear();
+  }
+
+  function refreshStepNumbers() {
+    stepRows.querySelectorAll(".step-row").forEach(function (row, index) {
+      row.querySelector(".step-row-number").textContent = String(index + 1);
+      const upBtn = row.querySelector(".step-row-up");
+      const downBtn = row.querySelector(".step-row-down");
+      upBtn.disabled = index === 0;
+      downBtn.disabled = index === stepRows.querySelectorAll(".step-row").length - 1;
+    });
+  }
+
+  function addStepRow(line) {
+    const fragment = stepRowTemplate.content.cloneNode(true);
+    stepRows.appendChild(fragment);
+    const mountedRow = stepRows.lastElementChild;
+
+    if (line) {
+      mountedRow.querySelector(".step-row-description").value = line.description || "";
+    }
+
+    mountedRow.querySelector(".step-row-up").addEventListener("click", function () {
+      const previous = mountedRow.previousElementSibling;
+      if (previous) {
+        stepRows.insertBefore(mountedRow, previous);
+        refreshStepNumbers();
+      }
+    });
+
+    mountedRow.querySelector(".step-row-down").addEventListener("click", function () {
+      const next = mountedRow.nextElementSibling;
+      if (next) {
+        stepRows.insertBefore(next, mountedRow);
+        refreshStepNumbers();
+      }
+    });
+
+    mountedRow.querySelector(".step-row-remove").addEventListener("click", function () {
+      mountedRow.remove();
+      refreshStepNumbers();
+    });
+
+    refreshStepNumbers();
+  }
+
+  function resetStepRows(lines) {
+    stepRows.innerHTML = "";
+    if (lines && lines.length) {
+      lines.forEach(addStepRow);
+    }
+  }
+
+  function collectStepPayload() {
+    const rows = stepRows.querySelectorAll(".step-row");
+    const steps = [];
+
+    rows.forEach(function (row, index) {
+      const description = optionalString(row.querySelector(".step-row-description").value);
+      if (!description) {
+        return;
+      }
+
+      steps.push({
+        description: description,
+        sort_order: index,
+      });
+    });
+
+    return steps;
   }
 
   function addIngredientRow(line) {
@@ -124,6 +195,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       status: formData.get("status"),
       active: document.getElementById("recipe-active").checked,
       ingredients: collectIngredientPayload(),
+      steps: collectStepPayload(),
     };
 
     const fields = {
@@ -131,7 +203,6 @@ document.addEventListener("DOMContentLoaded", async function () {
       prep_time_minutes: formData.get("prep_time_minutes"),
       cook_time_minutes: formData.get("cook_time_minutes"),
       servings: formData.get("servings"),
-      instructions: formData.get("instructions"),
       image_url: formData.get("image_url"),
       pdf_url: formData.get("pdf_url"),
     };
@@ -163,6 +234,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     deleteRecipeBtn.classList.add("hidden");
     recipeForm.reset();
     document.getElementById("recipe-active").checked = true;
+    resetStepRows();
     resetIngredientRows();
     recipeModal.classList.remove("hidden");
   }
@@ -184,11 +256,11 @@ document.addEventListener("DOMContentLoaded", async function () {
       document.getElementById("recipe-prep").value = recipe.prep_time_minutes ?? "";
       document.getElementById("recipe-cook").value = recipe.cook_time_minutes ?? "";
       document.getElementById("recipe-servings").value = recipe.servings ?? "";
-      document.getElementById("recipe-instructions").value = recipe.instructions || "";
       document.getElementById("recipe-image-url").value = recipe.image_url || "";
       document.getElementById("recipe-pdf-url").value = recipe.pdf_url || "";
       document.getElementById("recipe-status").value = recipe.status;
       document.getElementById("recipe-active").checked = recipe.active;
+      resetStepRows(recipe.steps);
       resetIngredientRows(recipe.ingredients);
     } catch (error) {
       closeModal();
@@ -203,6 +275,7 @@ document.addEventListener("DOMContentLoaded", async function () {
     editIdInput.value = "";
     destroyComboboxes();
     ingredientRows.innerHTML = "";
+    stepRows.innerHTML = "";
   }
 
   function renderRows(items) {
@@ -302,6 +375,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   document.getElementById("create-recipe-btn").addEventListener("click", openCreateModal);
   document.getElementById("recipe-cancel-btn").addEventListener("click", closeModal);
+  document.getElementById("add-step-row-btn").addEventListener("click", function () {
+    addStepRow();
+  });
   document.getElementById("add-ingredient-row-btn").addEventListener("click", function () {
     addIngredientRow();
   });
