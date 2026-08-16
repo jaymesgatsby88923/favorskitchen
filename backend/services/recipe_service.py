@@ -37,6 +37,10 @@ STEP_LINE_FIELDS = (
 )
 
 
+def _quantity_for_db(quantity):
+    return float(quantity) if quantity is not None else None
+
+
 def _fetch_recipe_ingredients(recipe_id: UUID) -> list[RecipeIngredientLine]:
     response = (
         admin_supabase
@@ -96,7 +100,7 @@ def _insert_ingredient_lines(recipe_id: UUID, ingredients: list[RecipeIngredient
         rows.append({
             "recipe_id": str(recipe_id),
             "ingredient_id": str(resolved_id),
-            "quantity": line.quantity,
+            "quantity": _quantity_for_db(line.quantity),
             "unit": line.unit,
             "preparation": line.preparation,
             "notes": line.notes,

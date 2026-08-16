@@ -3,7 +3,7 @@ from decimal import Decimal
 from typing import Literal, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_serializer, model_validator
 
 RecipeStatus = Literal["draft", "published"]
 
@@ -77,6 +77,10 @@ class RecipeIngredientLine(BaseModel):
     preparation: Optional[str] = None
     notes: Optional[str] = None
     sort_order: int = 0
+
+    @field_serializer("quantity")
+    def serialize_quantity(self, value: Optional[Decimal]) -> Optional[float]:
+        return float(value) if value is not None else None
 
 
 class RecipeResponse(BaseModel):
